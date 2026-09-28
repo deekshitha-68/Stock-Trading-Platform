@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Trading Platform — Simulator | CodeAlpha Task 2</title>
+    <meta name="description" content="A simulated stock trading platform for educational purposes. CodeAlpha Java Internship Task 2. No real money or live market data.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ═══════════════════ NAVIGATION BAR ═══════════════════ -->
+    <nav id="navbar" class="hidden">
+        <div class="nav-brand">
+            <span class="nav-logo">📈</span>
+            <span class="nav-title">StockSim</span>
+        </div>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">☰</button>
+        <div class="nav-links" id="nav-links">
+            <a href="#" class="nav-link active" data-page="dashboard">Dashboard</a>
+            <a href="#" class="nav-link" data-page="market">Market</a>
+            <a href="#" class="nav-link" data-page="portfolio">Portfolio</a>
+            <a href="#" class="nav-link" data-page="transactions">History</a>
+            <a href="#" class="nav-link" data-page="profile">Profile</a>
+        </div>
+        <div class="nav-balance">
+            <span class="balance-label">Balance</span>
+            <span class="balance-value" id="nav-balance">$0.00</span>
+        </div>
+    </nav>
+
+    <!-- ═══════════════════ LOGIN PAGE ═══════════════════════ -->
+    <section id="page-login" class="page">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <span class="login-logo">📈</span>
+                    <h1>StockSim</h1>
+                    <p class="login-subtitle">Stock Trading Platform — Simulator</p>
+                </div>
+                <div class="login-disclaimer">
+                    ⚠️ SIMULATION ONLY — No real money, no real stocks, no real trades. For educational purposes only.
+                </div>
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="login-name">Your Name</label>
+                        <input type="text" id="login-name" placeholder="Enter your name" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-balance">Starting Balance (USD)</label>
+                        <input type="number" id="login-balance" value="100000" min="1000" step="1000">
+                        <span class="form-hint">Default: $100,000</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">
+                        Start Trading →
+                    </button>
+                </form>
+                <p class="login-footer">CodeAlpha Java Internship — Task 2</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ DASHBOARD ════════════════════════ -->
+    <section id="page-dashboard" class="page hidden">
+        <div class="container">
+            <div class="page-header">
+                <h1 id="dash-greeting">Welcome back</h1>
+                <p class="page-subtitle">Your trading overview at a glance</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon icon-balance">💰</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Available Balance</span>
+                        <span class="stat-value" id="dash-balance">$0.00</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-portfolio">📊</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Portfolio Value</span>
+                        <span class="stat-value" id="dash-portfolio-value">$0.00</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-investment">📈</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Investment</span>
+                        <span class="stat-value" id="dash-investment">$0.00</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-pl">💹</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Profit / Loss</span>
+                        <span class="stat-value" id="dash-pl">$0.00</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-stocks">📦</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Stocks Owned</span>
+                        <span class="stat-value" id="dash-stocks-count">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="btn btn-primary" onclick="navigateTo('market')">🏪 View Market</button>
+                <button class="btn btn-outline" onclick="navigateTo('portfolio')">📂 My Portfolio</button>
+                <button class="btn btn-outline" onclick="navigateTo('transactions')">📋 Transaction History</button>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="card">
+                <h2 class="card-title">Recent Activity</h2>
+                <div id="dash-recent-transactions">
+                    <p class="empty-state">No transactions yet. Start by buying some stocks!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ MARKET PAGE ══════════════════════ -->
+    <section id="page-market" class="page hidden">
+        <div class="container">
+            <div class="page-header">
+                <div>
+                    <h1>Market Overview</h1>
+                    <p class="page-subtitle">Simulated stock prices — not real market data</p>
+                </div>
+                <div class="page-actions">
+                    <button class="btn btn-outline" onclick="handleSimulateTick()">⟳ Update Prices</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="data-table" id="market-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Company</th>
+                                <th class="text-right">Price</th>
+                                <th class="text-right">Change</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="market-tbody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="market-footer">
+                <p>💡 Prices update automatically every 30 seconds or click "Update Prices" manually.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ PORTFOLIO PAGE ═══════════════════ -->
+    <section id="page-portfolio" class="page hidden">
+        <div class="container">
+            <div class="page-header">
+                <h1>My Portfolio</h1>
+                <p class="page-subtitle">Your current stock holdings and performance</p>
+            </div>
+
+            <!-- Portfolio Summary -->
+            <div class="portfolio-summary" id="portfolio-summary">
+                <div class="summary-item">
+                    <span class="summary-label">Total Value</span>
+                    <span class="summary-value" id="port-total-value">$0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Total Invested</span>
+                    <span class="summary-value" id="port-total-invested">$0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Total P/L</span>
+                    <span class="summary-value" id="port-total-pl">$0.00</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive" id="portfolio-content">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ TRANSACTION HISTORY ══════════════ -->
+    <section id="page-transactions" class="page hidden">
+        <div class="container">
+            <div class="page-header">
+                <h1>Transaction History</h1>
+                <p class="page-subtitle">Complete record of all your trades</p>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive" id="transactions-content">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ PROFILE PAGE ═════════════════════ -->
+    <section id="page-profile" class="page hidden">
+        <div class="container">
+            <div class="page-header">
+                <h1>Profile</h1>
+                <p class="page-subtitle">Your account information</p>
+            </div>
+
+            <div class="card profile-card">
+                <div class="profile-avatar" id="profile-avatar">A</div>
+                <div class="profile-info">
+                    <h2 id="profile-name">User</h2>
+                    <p class="profile-meta">Member since <span id="profile-joined">—</span></p>
+                </div>
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <span class="profile-stat-label">Cash Balance</span>
+                        <span class="profile-stat-value" id="profile-balance">$0.00</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-label">Total Account Value</span>
+                        <span class="profile-stat-value" id="profile-total-value">$0.00</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-label">Total Trades</span>
+                        <span class="profile-stat-value" id="profile-total-trades">0</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-label">Stocks Owned</span>
+                        <span class="profile-stat-value" id="profile-stocks-count">0</span>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn btn-danger" onclick="handleLogout()">Logout</button>
+                </div>
+                <p class="profile-disclaimer">
+                    ⚠️ This is a simulated trading platform. No real money or stocks are involved.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ BUY MODAL ════════════════════════ -->
+    <div id="buy-modal" class="modal hidden">
+        <div class="modal-overlay" onclick="closeModal('buy-modal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Buy Stock</h2>
+                <button class="modal-close" onclick="closeModal('buy-modal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-stock-info">
+                    <span class="modal-stock-symbol" id="buy-symbol">AAPL</span>
+                    <span class="modal-stock-name" id="buy-company">Apple Inc.</span>
+                    <span class="modal-stock-price" id="buy-price">$0.00</span>
+                </div>
+                <div class="form-group">
+                    <label for="buy-quantity">Quantity</label>
+                    <input type="number" id="buy-quantity" min="1" value="1" oninput="updateBuyTotal()">
+                </div>
+                <div class="modal-summary">
+                    <div class="summary-row">
+                        <span>Price per share</span>
+                        <span id="buy-price-display">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Quantity</span>
+                        <span id="buy-qty-display">1</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total Cost</span>
+                        <span id="buy-total-cost">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Your Balance</span>
+                        <span id="buy-balance">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Balance After</span>
+                        <span id="buy-balance-after">$0.00</span>
+                    </div>
+                </div>
+                <div id="buy-error" class="modal-error hidden"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('buy-modal')">Cancel</button>
+                <button class="btn btn-success" id="buy-confirm-btn" onclick="confirmBuy()">Confirm Purchase</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ SELL MODAL ═══════════════════════ -->
+    <div id="sell-modal" class="modal hidden">
+        <div class="modal-overlay" onclick="closeModal('sell-modal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Sell Stock</h2>
+                <button class="modal-close" onclick="closeModal('sell-modal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-stock-info">
+                    <span class="modal-stock-symbol" id="sell-symbol">AAPL</span>
+                    <span class="modal-stock-name" id="sell-company">Apple Inc.</span>
+                    <span class="modal-stock-price" id="sell-price">$0.00</span>
+                </div>
+                <div class="modal-owned">
+                    You own <strong id="sell-owned">0</strong> shares
+                </div>
+                <div class="form-group">
+                    <label for="sell-quantity">Quantity to Sell</label>
+                    <input type="number" id="sell-quantity" min="1" value="1" oninput="updateSellTotal()">
+                    <button class="btn-sell-all" onclick="sellAll()">Sell All</button>
+                </div>
+                <div class="modal-summary">
+                    <div class="summary-row">
+                        <span>Price per share</span>
+                        <span id="sell-price-display">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Quantity</span>
+                        <span id="sell-qty-display">1</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total Revenue</span>
+                        <span id="sell-total-revenue">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Estimated P/L</span>
+                        <span id="sell-estimated-pl">$0.00</span>
+                    </div>
+                </div>
+                <div id="sell-error" class="modal-error hidden"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('sell-modal')">Cancel</button>
+                <button class="btn btn-danger" id="sell-confirm-btn" onclick="confirmSell()">Confirm Sale</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ TOAST CONTAINER ══════════════════ -->
+    <div id="toast-container"></div>
+
+    <!-- ═══════════════════ SCRIPTS ══════════════════════════ -->
+    <script src="js/models.js"></script>
+    <script src="js/services.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
